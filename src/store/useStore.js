@@ -2,11 +2,18 @@ import { create } from 'zustand'
 import { fetchAll, persistTickets, persistMessages, persistCustomers, persistAgents, resetDemoData as apiReset, mockSession, mockSignIn, mockSignUp, mockSignOut } from '../services/api.js'
 import { uid } from '../lib/utils.js'
 
+function isSystemDark() {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-color-scheme: dark)').matches
+}
+
 function applyTheme(theme) {
   const root = document.documentElement
-  if (theme === 'dark') root.classList.add('dark')
-  else if (theme === 'light') root.classList.remove('dark')
-  else root.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const dark = theme === 'dark' || (theme !== 'light' && isSystemDark())
+  root.classList.toggle('dark', dark)
+  try {
+    root.style.colorScheme = dark ? 'dark' : 'light'
+  } catch { /* ignore */ }
 }
 
 const savedTheme = (() => {
@@ -164,6 +171,15 @@ export const useStore = create((set, get) => ({
 
 export function initTheme() {
   applyTheme(savedTheme)
+  try {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = () => {
+      const current = useStore.getState().theme
+      if (!current || current === 'system') applyTheme('system')
+    }
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange)
+    else if (typeof mq.addListener === 'function') mq.addListener(onChange)
+  } catch { /* ignore */ }
 }
 
 // Selectors

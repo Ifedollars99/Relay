@@ -87,10 +87,10 @@ export default function Dashboard() {
         <Card className="p-4"><p className="flex items-center gap-1 text-xs text-slate-500"><Star size={12} className="text-amber-400" /> CSAT</p><p className="mt-1 text-2xl font-extrabold">{stats.cur.csat ? stats.cur.csat.toFixed(1) : '—'}</p><p className="text-xs text-slate-500">customer satisfaction</p></Card>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="min-w-0 overflow-hidden xl:col-span-2">
           <SectionTitle title="Ticket volume" subtitle={`New vs resolved · last ${days} days`} />
-          <div className="h-64">
+          <div className="h-56 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={series} margin={{ top: 5, right: 10, left: -15, bottom: 0 }}>
                 <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
@@ -102,9 +102,9 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
         </Card>
-        <Card>
+        <Card className="min-w-0 overflow-hidden">
           <SectionTitle title="By status" subtitle="Current queue mix" />
-          <div className="h-48">
+          <div className="h-44 sm:h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={statusData} dataKey="value" nameKey="name" innerRadius={52} outerRadius={76} paddingAngle={2}>
@@ -135,28 +135,30 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="min-w-0 overflow-hidden xl:col-span-2">
           <SectionTitle title="Recent conversations" subtitle="Latest activity" action={<Link to="/app/inbox" className="text-xs font-semibold text-brand-600 hover:underline">Open inbox</Link>} />
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {recent.map((t) => {
               const c = customerById(state, t.customerId)
               return (
-                <Link key={t.id} to={`/app/tickets/${t.id}`} className="flex items-center gap-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg px-2">
-                  <Avatar name={c?.name} id={c?.id} size="sm" />
+                <Link key={t.id} to={`/app/tickets/${t.id}`} className="flex items-center gap-2 rounded-lg px-2 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 sm:gap-3">
+                  <span className="shrink-0"><Avatar name={c?.name} id={c?.id} size="sm" /></span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{t.subject}</p>
                     <p className="truncate text-xs text-slate-500">{c?.name} · {c?.company} · {timeAgo(t.updatedAt)}</p>
                   </div>
-                  <StatusBadge status={t.status} />
-                  <PriorityBadge priority={t.priority} />
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    <StatusBadge status={t.status} />
+                    <span className="hidden sm:inline-flex"><PriorityBadge priority={t.priority} /></span>
+                  </span>
                 </Link>
               )
             })}
           </div>
         </Card>
-        <div className="space-y-4">
-          <Card>
+        <div className="min-w-0 space-y-4">
+          <Card className="min-w-0 overflow-hidden">
             <SectionTitle title="Upcoming SLAs" subtitle="Sorted by deadline" />
             <div className="space-y-2">
               {sla.map((t) => {
@@ -165,14 +167,14 @@ export default function Dashboard() {
                   <Link key={t.id} to={`/app/tickets/${t.id}`} className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm hover:border-brand-300 dark:border-slate-700">
                     {overdue ? <AlertTriangle size={15} className="text-rose-500" /> : <Clock size={15} className="text-slate-400" />}
                     <span className="min-w-0 flex-1 truncate font-medium">{t.subject}</span>
-                    <span className={cn('text-xs font-semibold', overdue ? 'text-rose-600' : 'text-slate-500')}>{overdue ? 'Overdue' : timeAgo(t.slaDueAt).replace(' ago', ' left')}</span>
+                    <span className={cn('shrink-0 whitespace-nowrap text-xs font-semibold', overdue ? 'text-rose-600' : 'text-slate-500')}>{overdue ? 'Overdue' : timeAgo(t.slaDueAt).replace(' ago', ' left')}</span>
                   </Link>
                 )
               })}
               {sla.length === 0 && <p className="text-sm text-slate-500">Queue is clear. Nice work.</p>}
             </div>
           </Card>
-          <Card>
+          <Card className="min-w-0 overflow-hidden">
             <SectionTitle title="Agent performance" subtitle="Resolved all-time" action={<Link to="/app/team" className="text-xs font-semibold text-brand-600 hover:underline">Team</Link>} />
             <div className="space-y-2.5">
               {agentRows.map((a) => (

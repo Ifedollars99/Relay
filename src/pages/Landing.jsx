@@ -40,10 +40,10 @@ function Nav() {
 
 function DashboardPreview() {
   const rows = [
-    ['RL-1089', 'Invoice shows double charge', 'High', 'Pending', 'bg-amber-100 text-amber-700'],
-    ['RL-1086', 'SSO login loops back', 'Urgent', 'Open', 'bg-sky-100 text-sky-700'],
-    ['RL-1082', 'Webhook delays ~20 min', 'High', 'Open', 'bg-sky-100 text-sky-700'],
-    ['RL-1079', 'Saved views in inbox', 'Medium', 'Resolved', 'bg-emerald-100 text-emerald-700'],
+    ['RL-1089', 'Invoice shows double charge', 'High', 'Pending', 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'],
+    ['RL-1086', 'SSO login loops back', 'Urgent', 'Open', 'bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'],
+    ['RL-1082', 'Webhook delays ~20 min', 'High', 'Open', 'bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'],
+    ['RL-1079', 'Saved views in inbox', 'Medium', 'Resolved', 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'],
   ]
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-pop dark:border-slate-700 dark:bg-slate-900">

@@ -1,10 +1,35 @@
+import { useEffect, useState } from 'react'
 import { Menu, Moon, Sun, Search } from 'lucide-react'
 import { useStore } from '../../store/useStore.js'
 import { Button } from '../ui/primitives.jsx'
 
+function useEffectiveDark(theme) {
+  const [systemDark, setSystemDark] = useState(() =>
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : false
+  )
+  useEffect(() => {
+    if (theme !== 'system') return
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = (e) => setSystemDark(e.matches)
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange)
+    else if (typeof mq.addListener === 'function') mq.addListener(onChange)
+    setSystemDark(mq.matches)
+    return () => {
+      if (typeof mq.removeEventListener === 'function') mq.removeEventListener('change', onChange)
+      else if (typeof mq.removeListener === 'function') mq.removeListener(onChange)
+    }
+  }, [theme])
+  if (theme === 'dark') return true
+  if (theme === 'light') return false
+  return systemDark
+}
+
 export function Topbar({ onMenu, title, subtitle, actions }) {
+  const theme = useStore((s) => s.theme)
   const setTheme = useStore((s) => s.setTheme)
-  const dark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const dark = useEffectiveDark(theme || 'system')
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">

@@ -26,7 +26,7 @@ function Shell({ title, subtitle, children, footer }) {
         </div>
         <p className="text-xs text-slate-500">Portfolio implementation — mock auth, no real credentials leave your browser.</p>
       </div>
-      <div className="flex items-center justify-center p-6 sm:p-10">
+      <div className="flex items-center justify-center bg-white p-6 dark:bg-slate-950 sm:p-10">
         <div className="w-full max-w-md">
           <Link to="/" className="mb-6 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"><ArrowLeft size={15} /> Back home</Link>
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
