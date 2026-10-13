@@ -31,19 +31,19 @@ export function Customers() {
       {rows.length === 0 && <Card><EmptyState title="No customers match" description="Try a different search." /></Card>}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((c) => (
-          <Link key={c.id} to={`/app/customers/${c.id}`} className="card p-4 transition-shadow hover:shadow-pop">
+          <Link key={c.id} to={`/app/customers/${c.id}`} className="card group p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-pop dark:hover:border-slate-700">
             <div className="flex items-center gap-3">
               <Avatar name={c.name} id={c.id} size="lg" />
               <div className="min-w-0 flex-1">
-                <p className="truncate font-bold">{c.name}</p>
+                <p className="truncate font-bold tracking-tight group-hover:text-brand-700 dark:group-hover:text-brand-300">{c.name}</p>
                 <p className="truncate text-xs text-slate-500">{c.company} · {c.plan}</p>
               </div>
-              <Badge tone={c.status === 'vip' ? 'indigo' : c.status === 'churn-risk' ? 'rose' : c.status === 'new' ? 'sky' : 'slate'} className="capitalize">{c.status}</Badge>
+              <Badge tone={c.status === 'vip' ? 'indigo' : c.status === 'churn-risk' ? 'rose' : c.status === 'new' ? 'sky' : 'slate'} className="capitalize">{c.status.replace('-', ' ')}</Badge>
             </div>
-            <div className="mt-3 flex gap-4 text-xs text-slate-500">
-              <span><strong className="text-slate-900 dark:text-white">{c.open}</strong> open</span>
-              <span><strong className="text-slate-900 dark:text-white">{c.resolved}</strong> resolved</span>
-              <span className="ml-auto">{c.total} total</span>
+            <div className="mt-3 flex items-center gap-4 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800">
+              <span><strong className="font-extrabold tabular-nums text-slate-900 dark:text-white">{c.open}</strong> open</span>
+              <span><strong className="font-extrabold tabular-nums text-slate-900 dark:text-white">{c.resolved}</strong> resolved</span>
+              <span className="ml-auto tabular-nums">{c.total} total</span>
             </div>
             {c.tags.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{c.tags.map((t) => <Badge key={t}>#{t}</Badge>)}</div>}
           </Link>
@@ -90,8 +90,8 @@ export function CustomerDetail() {
           <div className="flex flex-wrap items-center gap-4">
             <Avatar name={customer.name} id={customer.id} size="lg" className="!h-14 !w-14 !text-base" />
             <div className="min-w-0 flex-1">
-              <h2 className="text-xl font-bold">{customer.name}</h2>
-              <p className="text-sm text-slate-500">{customer.email} · {customer.company}</p>
+              <h2 className="text-xl font-extrabold tracking-tight">{customer.name}</h2>
+              <p className="mt-0.5 text-sm text-slate-500">{customer.email} · {customer.company}</p>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 <Badge className="capitalize" tone={customer.status === 'vip' ? 'indigo' : customer.status === 'churn-risk' ? 'rose' : 'slate'}>{customer.status}</Badge>
                 <Badge>{customer.plan} plan</Badge>
@@ -119,7 +119,7 @@ export function CustomerDetail() {
       <aside className="space-y-4">
         <Card>
           <h3 className="text-sm font-bold">Notes</h3>
-          <textarea aria-label="Customer notes" rows={4} className="input mt-2 resize-none" value={draft} onChange={(e) => setNotes(e.target.value)} placeholder="Context the next agent should know…" />
+          <textarea aria-label="Customer notes" rows={4} className="input mt-2 resize-none" value={draft} onChange={(e) => setNotes(e.target.value)} placeholder="What should the next agent know?" />
           <Button size="sm" className="mt-2" disabled={draft === (customer.notes ?? '')} onClick={saveNotes}><Save size={14} /> Save notes</Button>
         </Card>
         <Card>

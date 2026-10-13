@@ -23,15 +23,15 @@ function RequireAuth({ children }) {
 function Shell() {
   const location = useLocation()
   const map = [
-    [/^\/app\/?$/, 'Dashboard', 'Team performance at a glance.'],
-    [/inbox/, 'Inbox', 'Triage every conversation in one queue.'],
-    [/\/tickets\/.+/, 'Ticket detail', 'Full history, ownership and replies.'],
-    [/tickets/, 'Tickets', 'Search, sort, assign and resolve at scale.'],
+    [/^\/app\/?$/, 'Dashboard', 'How the queue looks right now.'],
+    [/inbox/, 'Inbox', 'Every conversation in one place.'],
+    [/\/tickets\/.+/, 'Ticket detail', 'History, ownership and replies.'],
+    [/tickets/, 'Tickets', 'Search, assign and resolve.'],
     [/\/customers\/.+/, 'Customer profile', 'History, notes and open work.'],
-    [/customers/, 'Customers', 'Everyone you support, in one place.'],
-    [/analytics/, 'Analytics', 'Volume, response times and satisfaction.'],
-    [/team/, 'Team', 'Agents, roles and workload.'],
-    [/settings/, 'Settings', 'Profile, appearance and workspace.'],
+    [/customers/, 'Customers', 'Everyone you support.'],
+    [/analytics/, 'Analytics', 'Volume, response and satisfaction.'],
+    [/team/, 'Team', 'Who is doing what.'],
+    [/settings/, 'Settings', 'Profile, theme and workspace.'],
   ]
   const found = map.find(([re]) => re.test(location.pathname))
   return <AppShell title={found?.[1] || 'Relay'} subtitle={found?.[2]} />

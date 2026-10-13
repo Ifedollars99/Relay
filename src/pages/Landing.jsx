@@ -90,12 +90,12 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pt-20">
         <div className="mx-auto max-w-3xl text-center">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <Badge className="mb-4 border border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">New · AI-assisted triage in beta</Badge>
+            <Badge className="mb-4 border border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">AI-assisted triage in beta</Badge>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
               Customer support, <span className="text-brand-600 dark:text-brand-400">minus the chaos.</span>
             </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base text-slate-600 dark:text-slate-400 sm:text-lg">
-              Relay brings every conversation, ticket, customer and SLA into one fast inbox — so small teams can reply in minutes, not days.
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-400 sm:text-lg">
+              Every conversation, SLA and customer in one fast inbox — so a small team can reply in minutes.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
               <Link to="/signup"><Button size="lg" className="w-full sm:w-auto">Start free trial <ArrowRight size={16} /></Button></Link>
@@ -113,7 +113,7 @@ export default function Landing() {
       <section id="features" className="border-y border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-center text-2xl font-bold tracking-tight sm:text-3xl">Everything a support team needs</h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-600 dark:text-slate-400">One workspace for conversations, ownership, SLAs and performance — designed for speed.</p>
+          <p className="mx-auto mt-2 max-w-xl text-center text-sm leading-relaxed text-slate-600 dark:text-slate-400">Conversations, ownership, SLAs and reporting in one workspace.</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               [Inbox, 'Shared inbox', 'Every channel in one queue with collision detection, saved views and keyboard-first triage.'],

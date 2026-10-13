@@ -45,7 +45,7 @@ export default function Analytics() {
   const exportCSV = () => {
     const rows = inRange.map((t) => ({ id: t.id, subject: t.subject, status: t.status, priority: t.priority, category: t.category, assignee: agents.find((a) => a.id === t.assigneeId)?.name || 'Unassigned', created: t.createdAt, first_response_min: t.firstResponseMin ?? '', satisfaction: t.satisfaction ?? '' }))
     downloadCSV(`relay-tickets-${range}.csv`, rows.length ? rows : [{ note: 'no rows in range' }])
-    pushToast({ title: 'CSV exported', description: `${rows.length} ticket(s) from the last ${days} days.`, variant: 'success' })
+    pushToast({ title: 'Export ready', description: `${rows.length} ${rows.length === 1 ? 'ticket' : 'tickets'} from the last ${days} days.`, variant: 'success' })
   }
 
   const chartH = 'h-60'
@@ -53,10 +53,10 @@ export default function Analytics() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex gap-1 rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900">
-          {RANGES.map((r) => <button key={r.k} onClick={() => setRange(r.k)} className={cn('rounded-lg px-3 py-1.5 text-xs font-semibold', range === r.k ? 'bg-brand-600 text-white' : 'text-slate-500')}>{r.k}</button>)}
+        <div className="flex gap-1 rounded-xl border border-slate-200/90 bg-white p-1 shadow-sm dark:border-slate-700/70 dark:bg-slate-900">
+          {RANGES.map((r) => <button key={r.k} onClick={() => setRange(r.k)} className={cn('rounded-lg px-3 py-1.5 text-xs font-bold transition-all duration-150', range === r.k ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800')}>{r.k}</button>)}
         </div>
-        <span className="text-xs text-slate-500">{inRange.length} tickets in range</span>
+        <span className="text-xs font-medium tabular-nums text-slate-500">{inRange.length} tickets in range</span>
         <Button size="sm" variant="secondary" className="ml-auto" onClick={exportCSV}><Download size={15} /> Export CSV</Button>
       </div>
 

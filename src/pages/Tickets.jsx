@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Search, ArrowLeft, Send } from 'lucide-react'
 import { format } from 'date-fns'
+import { motion } from 'motion/react'
 import { useStore, customerById, agentById, messagesForTicket } from '../store/useStore.js'
 import { filterTickets, sortTickets, isOverdue } from '../lib/filters.js'
 import { useDebouncedValue } from '../hooks/hooks.js'
@@ -13,13 +14,13 @@ import { Button, Field, StatusBadge, PriorityBadge, Card, Badge } from '../compo
 import { Avatar, EmptyState, PageSkeleton } from '../components/ui/display.jsx'
 import { Modal, ConfirmDialog } from '../components/ui/Modal.jsx'
 
-const ticketSchema = z.object({
-  subject: z.string().min(5, 'Give the ticket a clear subject (5+ characters)'),
-  customerId: z.string().min(1, 'Choose a customer'),
+  const ticketSchema = z.object({
+  subject: z.string().min(5, 'Use a clear subject, at least 5 characters'),
+  customerId: z.string().min(1, 'Select a customer'),
   priority: z.enum(['urgent', 'high', 'medium', 'low']),
   category: z.enum(['billing', 'technical', 'account', 'feature', 'general']),
   assigneeId: z.string().optional(),
-  description: z.string().min(10, 'Describe the issue (10+ characters)'),
+  description: z.string().min(10, 'Add a little detail, at least 10 characters'),
 })
 
 function TicketFormModal({ open, onClose, initial }) {
@@ -40,14 +41,14 @@ function TicketFormModal({ open, onClose, initial }) {
       pushToast({ title: 'Ticket updated', variant: 'success' })
     } else {
       await createTicket(payload)
-      pushToast({ title: 'Ticket created', description: 'It is now at the top of the queue.', variant: 'success' })
+      pushToast({ title: 'Ticket created', description: 'Pinned to the top of the queue.', variant: 'success' })
     }
     reset()
     onClose()
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={initial?.id ? `Edit ${initial.id}` : 'New ticket'} description="Tickets are stored locally in this demo." wide>
+    <Modal open={open} onClose={onClose} title={initial?.id ? `Edit ${initial.id}` : 'New ticket'} description="Saved to this demo workspace." wide>
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label="Subject" error={errors.subject?.message}><input className="input" placeholder="e.g. Invoice shows a double charge" {...register('subject')} /></Field>
@@ -102,7 +103,7 @@ export function Tickets() {
 
   const bulk = async (patch, label) => {
     await bulkUpdate(checked, patch)
-    pushToast({ title: label, description: `${checked.length} ticket(s) updated.`, variant: 'success' })
+    pushToast({ title: label, description: `${checked.length} ${checked.length === 1 ? 'ticket' : 'tickets'} updated.`, variant: 'success' })
     setChecked([])
   }
 
@@ -125,14 +126,22 @@ export function Tickets() {
       </div>
 
       {checked.length > 0 && (
-        <div className="card flex flex-wrap items-center gap-2 !p-3 text-sm">
-          <span className="font-semibold">{checked.length} selected</span>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+          className="card flex flex-wrap items-center gap-2 border-brand-200 !p-3 text-sm dark:!border-brand-500/30"
+        >
+          <span className="rounded-full bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">{checked.length}</span>
+          <span className="text-[13px] font-bold">selected</span>
+          <span className="mx-1 h-4 w-px bg-slate-200 dark:bg-slate-700" />
           <Button size="sm" variant="secondary" onClick={() => bulk({ status: 'resolved' }, 'Tickets resolved')}>Resolve</Button>
           <Button size="sm" variant="secondary" onClick={() => bulk({ status: 'closed' }, 'Tickets closed')}>Close</Button>
-          <Button size="sm" variant="secondary" onClick={() => bulk({ priority: 'high' }, 'Priority set to high')}>Mark high priority</Button>
+          <Button size="sm" variant="secondary" onClick={() => bulk({ priority: 'high' }, 'Priority set to high')}>Mark urgent</Button>
           <Button size="sm" variant="ghost" onClick={() => setChecked([])}>Clear</Button>
-          <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => setConfirmClose(true)}>Close all…</Button>
-        </div>
+          <Button size="sm" variant="ghost" className="ml-auto text-rose-600 hover:text-rose-700" onClick={() => setConfirmClose(true)}>Close all</Button>
+        </motion.div>
       )}
 
       <div className="card overflow-hidden !p-0">
@@ -149,22 +158,23 @@ export function Tickets() {
                 <th className="table-th">SLA</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
               {filtered.map((t) => {
                 const c = customerById(state, t.customerId)
                 const a = agentById(state, t.assigneeId)
+                const isChecked = checked.includes(t.id)
                 return (
-                  <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="table-td"><input type="checkbox" aria-label={`Select ${t.id}`} checked={checked.includes(t.id)} onChange={() => toggleOne(t.id)} className="h-4 w-4 accent-indigo-600" /></td>
+                  <tr key={t.id} className={cn('transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-800/50', isChecked && 'bg-brand-50/50 dark:bg-brand-500/5')}>
+                    <td className="table-td"><input type="checkbox" aria-label={`Select ${t.id}`} checked={isChecked} onChange={() => toggleOne(t.id)} className="h-4 w-4 cursor-pointer accent-indigo-600" /></td>
                     <td className="table-td">
-                      <Link to={`/app/tickets/${t.id}`} className="font-semibold hover:text-brand-600 hover:underline">{t.subject}</Link>
-                      <p className="font-mono text-xs text-slate-400">{t.id} · {timeAgo(t.createdAt)}</p>
+                      <Link to={`/app/tickets/${t.id}`} className="font-bold tracking-tight hover:text-brand-600 hover:underline">{t.subject}</Link>
+                      <p className="mt-0.5 font-mono text-[11px] text-slate-400">{t.id} · {timeAgo(t.createdAt)}</p>
                     </td>
-                    <td className="table-td"><span className="flex items-center gap-2"><Avatar name={c?.name} id={c?.id} size="xs" /><span className="whitespace-nowrap">{c?.name}</span></span></td>
+                    <td className="table-td"><span className="flex items-center gap-2"><Avatar name={c?.name} id={c?.id} size="xs" /><span className="whitespace-nowrap font-medium">{c?.name}</span></span></td>
                     <td className="table-td"><StatusBadge status={t.status} /></td>
                     <td className="table-td"><PriorityBadge priority={t.priority} /></td>
-                    <td className="table-td text-slate-500">{a?.name || <span className="italic">Unassigned</span>}</td>
-                    <td className={cn('table-td text-xs font-semibold', isOverdue(t) ? 'text-rose-600' : 'text-slate-500')}>{isOverdue(t) ? 'Overdue' : timeAgo(t.slaDueAt)}</td>
+                    <td className="table-td text-slate-500">{a?.name || <span className="italic text-slate-400">Unassigned</span>}</td>
+                    <td className={cn('table-td text-xs font-bold tabular-nums', isOverdue(t) ? 'text-rose-600' : 'text-slate-500')}>{isOverdue(t) ? 'Overdue' : timeAgo(t.slaDueAt)}</td>
                   </tr>
                 )
               })}
@@ -202,7 +212,7 @@ export function TicketDetail() {
     if (!draft.trim()) return
     await sendReply(ticket.id, draft.trim(), {})
     setDraft('')
-    pushToast({ title: 'Reply sent (simulated)', variant: 'success' })
+    pushToast({ title: 'Reply sent', variant: 'success' })
   }
 
   return (

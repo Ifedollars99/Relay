@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Send, StickyNote, Inbox as InboxIcon, ChevronLeft } from 'lucide-react'
 import { format } from 'date-fns'
+import { motion } from 'motion/react'
 import { useStore, customerById, agentById, messagesForTicket } from '../store/useStore.js'
 import { filterTickets, sortTickets, isOverdue } from '../lib/filters.js'
 import { useDebouncedValue } from '../hooks/hooks.js'
@@ -77,7 +78,7 @@ export default function Inbox() {
     await sendReply(selected.id, draft.trim(), { isNote: tab === 'note' })
     setDraft('')
     setSending(false)
-    pushToast({ title: tab === 'note' ? 'Internal note added' : 'Reply sent (simulated)', description: tab === 'note' ? 'Only your team can see it.' : `Sent to ${customer?.email}`, variant: 'success' })
+    pushToast({ title: tab === 'note' ? 'Note added' : 'Reply sent', description: tab === 'note' ? 'Visible to your team only.' : `Delivered to ${customer?.email} in this demo.`, variant: 'success' })
   }
 
   const selectCls = 'input !w-auto text-xs font-medium py-1.5'
@@ -122,21 +123,29 @@ export default function Inbox() {
             const c = customerById(state, t.customerId)
             const active = t.id === selectedId
             return (
-              <button key={t.id} role="option" aria-selected={active} onClick={() => { setSelectedId(t.id); setShowDetail(true) }}
-                className={cn('flex w-full items-start gap-2.5 border-b border-slate-100 px-3.5 py-3 text-left hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/60', active && 'bg-brand-50/70 dark:bg-brand-500/10')}>
+              <motion.button
+                key={t.id}
+                role="option"
+                aria-selected={active}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15 }}
+                onClick={() => { setSelectedId(t.id); setShowDetail(true) }}
+                className={cn('relative flex w-full items-start gap-2.5 border-b border-slate-100 px-3.5 py-3 text-left transition-colors duration-150 hover:bg-slate-50 dark:border-slate-800/80 dark:hover:bg-slate-800/60', active && 'bg-brand-50/60 dark:bg-brand-500/10')}>
+                {active && <motion.span layoutId="inbox-active" className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-brand-600 dark:bg-brand-400" transition={{ duration: 0.2 }} />}
                 <Avatar name={c?.name} id={c?.id} size="sm" />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
-                    <span className="truncate text-[13px] font-semibold">{t.subject}</span>
+                    <span className="truncate text-[13px] font-bold tracking-tight">{t.subject}</span>
                     {isOverdue(t) && <Badge tone="rose">SLA</Badge>}
                   </span>
                   <span className="mt-0.5 block truncate text-xs text-slate-500">{c?.name} · {t.id}</span>
-                  <span className="mt-1.5 flex items-center gap-1.5"><StatusBadge status={t.status} /><PriorityBadge priority={t.priority} /><span className="ml-auto text-[11px] text-slate-400">{timeAgo(t.updatedAt)}</span></span>
+                  <span className="mt-1.5 flex items-center gap-1.5"><StatusBadge status={t.status} /><PriorityBadge priority={t.priority} /><span className="ml-auto text-[11px] tabular-nums text-slate-400">{timeAgo(t.updatedAt)}</span></span>
                 </span>
-              </button>
+              </motion.button>
             )
           })}
-          {filtered.length === 0 && <EmptyState icon={InboxIcon} title="No conversations match" description="Try clearing search or filters." action={<Button size="sm" variant="secondary" onClick={() => { setSearch(''); setStatus('all'); setPriority('all'); setCategory('all'); setAssignee('all') }}>Clear filters</Button>} />}
+          {filtered.length === 0 && <EmptyState icon={InboxIcon} title="Nothing matches those filters" description="Try a shorter search term or clear a filter." action={<Button size="sm" variant="secondary" onClick={() => { setSearch(''); setStatus('all'); setPriority('all'); setCategory('all'); setAssignee('all') }}>Clear filters</Button>} />}
         </div>
         {visible < filtered.length && (
           <div className="border-t border-slate-200 p-2.5 dark:border-slate-800">
@@ -190,18 +199,21 @@ export default function Inbox() {
                 )
               })}
             </div>
-            <div className="border-t border-slate-200 p-3 dark:border-slate-800">
-              <div className="mb-2 flex gap-1 rounded-lg bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-800">
+            <div className="border-t border-slate-200/80 p-3 dark:border-slate-800">
+              <div className="mb-2 flex gap-1 rounded-xl bg-slate-100 p-1 text-xs font-bold dark:bg-slate-800">
                 {[['reply', 'Reply'], ['note', 'Internal note']].map(([k, label]) => (
-                  <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn('flex-1 rounded-md px-3 py-1.5', tab === k ? 'bg-white shadow text-slate-900 dark:bg-slate-900 dark:text-white' : 'text-slate-500')}>{label}</button>
+                  <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn('relative flex-1 rounded-lg px-3 py-1.5 transition-colors', tab !== k && 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300')}>
+                    {tab === k && <motion.span layoutId="composer-tab" className="absolute inset-0 rounded-lg bg-white shadow-sm dark:bg-slate-900" transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} />}
+                    <span className="relative">{label}</span>
+                  </button>
                 ))}
               </div>
               <label className="sr-only" htmlFor="composer">{tab === 'note' ? 'Internal note' : 'Reply'}</label>
               <textarea id="composer" rows={3} value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') doSend() }}
-                placeholder={tab === 'note' ? 'Add a note for your team… (⌘+Enter to save)' : `Reply to ${customer?.name}… (⌘+Enter to send)`} className="input resize-none" />
+                placeholder={tab === 'note' ? 'Add a note for your team… (Cmd + Enter to save)' : `Reply to ${customer?.name}… (Cmd + Enter to send)`} className="input resize-none" />
               <div className="mt-2 flex items-center justify-between">
-                <p className="text-[11px] text-slate-400">{tab === 'note' ? 'Only visible to your team.' : 'Simulated send — no real email leaves the demo.'}</p>
-                <Button size="sm" disabled={!draft.trim() || sending} onClick={doSend}><Send size={14} /> {sending ? 'Sending…' : tab === 'note' ? 'Add note' : 'Send reply'}</Button>
+                <p className="text-[11px] text-slate-400">{tab === 'note' ? 'Only your team can see this.' : 'Demo workspace — replies stay in your browser.'}</p>
+                <Button size="sm" loading={sending} disabled={!draft.trim() || sending} onClick={doSend}><Send size={14} /> {sending ? 'Sending' : tab === 'note' ? 'Add note' : 'Send reply'}</Button>
               </div>
             </div>
           </>

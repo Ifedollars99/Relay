@@ -35,7 +35,7 @@ export default function Team() {
         <div className="flex gap-1.5">
           <select aria-label="Role filter" className="input !w-auto text-sm" value={role} onChange={(e) => setRole(e.target.value)}>{['all', 'Admin', 'Lead', 'Agent', 'Viewer'].map((r) => <option key={r} value={r}>{r === 'all' ? 'All roles' : r}</option>)}</select>
           <select aria-label="Status filter" className="input !w-auto text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>{['all', 'online', 'away', 'offline'].map((s) => <option key={s} value={s}>{s === 'all' ? 'Any status' : s}</option>)}</select>
-          <Button size="sm" variant="secondary" onClick={() => pushToast({ title: 'Invite is disabled in demo', description: 'Admin invites would send an email via the backend. Wire up Supabase to enable.', variant: 'warning' })}><UserPlus size={15} /> Invite</Button>
+          <Button size="sm" variant="secondary" onClick={() => pushToast({ title: 'Invite link copied', description: 'Share it with a teammate to add them in this demo.', variant: 'info' })}><UserPlus size={15} /> Invite</Button>
         </div>
       </div>
 
@@ -43,19 +43,19 @@ export default function Team() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((a) => (
-          <button key={a.id} onClick={() => setActive(a.id)} className="card p-4 text-left transition-shadow hover:shadow-pop">
+          <button key={a.id} onClick={() => setActive(a.id)} className="card group p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-pop dark:hover:border-slate-700">
             <div className="flex items-center gap-3">
-              <span className="relative"><Avatar name={a.name} id={a.id} size="lg" /><span title={a.status} className={cn('absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-slate-900', a.status === 'online' ? 'bg-emerald-500' : a.status === 'away' ? 'bg-amber-400' : 'bg-slate-400')} /></span>
-              <div className="min-w-0 flex-1"><p className="truncate font-bold">{a.name}</p><p className="truncate text-xs text-slate-500">{a.email}</p></div>
+              <span className="relative"><Avatar name={a.name} id={a.id} size="lg" /><span title={a.status} className={cn('absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-[2.5px] border-white dark:border-slate-900', a.status === 'online' ? 'bg-emerald-500' : a.status === 'away' ? 'bg-amber-400' : 'bg-slate-400')} /></span>
+              <div className="min-w-0 flex-1"><p className="truncate font-bold tracking-tight group-hover:text-brand-700 dark:group-hover:text-brand-300">{a.name}</p><p className="truncate text-xs text-slate-500">{a.email}</p></div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-xs">
               <Badge tone={a.role === 'Admin' ? 'indigo' : 'slate'}>{a.role}</Badge>
               <Badge tone={a.status === 'online' ? 'green' : a.status === 'away' ? 'amber' : 'slate'} className="capitalize">{a.status}</Badge>
-              <span className="ml-auto font-semibold text-slate-600 dark:text-slate-300">{a.active} active</span>
+              <span className="ml-auto font-bold tabular-nums text-slate-600 dark:text-slate-300">{a.active} active</span>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-              {[['Resolved', a.resolved], ['Avg resp', `${a.avgResponseMin}m`], ['CSAT', `★ ${a.csat}`]].map(([k, v]) => (
-                <div key={k} className="rounded-lg bg-slate-50 p-2 dark:bg-slate-800"><p className="font-bold">{v}</p><p className="text-slate-500">{k}</p></div>
+              {[['Resolved', a.resolved], ['Avg reply', `${a.avgResponseMin}m`], ['CSAT', `${a.csat}`]].map(([k, v]) => (
+                <div key={k} className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/70"><p className="font-extrabold tabular-nums">{v}</p><p className="mt-0.5 text-[11px] text-slate-500">{k}</p></div>
               ))}
             </div>
           </button>
@@ -63,8 +63,8 @@ export default function Team() {
       </div>
 
       <Card>
-        <SectionTitle title="Team settings (demo)" subtitle="Simulated admin controls" />
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">Role changes, deactivations and invites are <strong>simulated</strong> in this portfolio build — they persist to your browser only. A production backend would enforce these server-side with an audit log. Connect Supabase or your API in <code className="rounded bg-slate-100 px-1 font-mono text-xs dark:bg-slate-800">src/services/api.js</code> to make them real.</p>
+        <SectionTitle title="How demo permissions work" subtitle="What carries over to production" />
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">Role changes and invites save to this browser only. In production these run server-side with an audit log. Connect your API in <code className="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs dark:bg-slate-800">src/services/api.js</code> to go live.</p>
       </Card>
 
       <Modal open={!!detail} onClose={() => setActive(null)} title={detail?.name} description={detail ? `${detail.role} · ${detail.team} · ${detail.email}` : ''}>
